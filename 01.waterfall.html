@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+        <meta charset="UTF-8">
+        <title>JQuery 实现瀑布流</title>
+        <style>
+        body {
+                text-align: center;
+                margin: 0;
+                padding: 0;
+                background-color: #F7F7F7;
+                font-family: '微软雅黑';
+        }
+
+        .wrapper {
+                padding: 50px;
+        }
+
+        img {
+                display: block;
+                width: 100%;
+                height: 300px;
+        }
+
+        .items {
+                position: relative;
+                /* display: flex; */
+                /* 环函 */
+                /* flex-wrap: wrap; */
+        }
+
+        .item {
+                width: 228px;
+                position: absolute;
+        }
+
+        .tips {
+                width: 280px;
+                height: 40px;
+                margin: 30px auto 0;
+                text-align: center;
+                line-height: 40px;
+                background-color: #CCC;
+                border-radius: 6px;
+                font-size: 24px;
+                cursor: pointer;
+        }
+
+        .tips.loading {
+                /* background-color: transparent; */
+                background-color: hotpink;
+        }
+        </style>
+
+</head>
+
+<body>
+        <h1>瀑布流 展示页面</h1>
+        <div class="wrapper">
+                <!-- items 作为 瀑布流的容器  瀑布流中的 元素的 宽度 是固定的 -->
+                <div class="items">
+                </div>
+                <p class="tips loading" >正在加载...</p>
+        </div>
+</body>
+</html>
+<script type="text/javascript" src="../jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.waterfall.js"></script>
+<script type="text/javascript" src="../template-native.js"></script>
+<script type="text/template" id="template">
+  <%for(var i=0;i<items.length;i++){%>
+    <div class="item">
+           <img src="<%=items[i].path%>">
+           <p><%=items[i].text %><p>
+    </div>
+
+ <% }%>
+
+</script>
+
+<!-- 为按钮绑定点击事件 -->
+<script type="text/javascript">
+        $(function () {
+                // 点击事件
+                $('.tips').click(function () {
+                        // 发送ajax请求
+                        $.ajax({
+                                url:'01.waterfall.php',
+                                type:'get',
+                                dataType:'json',
+                                success:function(data){
+                                        // 数组  转化为 js数组
+                                        // console.log(data);
+
+                                        // 包装为一个对象
+                                        var backObj = {
+                                                items:data
+                                        };
+
+                                        // 调用模板引擎 获取 生成的html
+                                        var resultStr = template('template',backObj);
+
+                                        console.log(resultStr);
+
+                                        // 添加到界面上
+                                        $('.items').append(resultStr);
+
+                                        // 直接调用 我们封装好的 瀑布流方法 即可完成布局
+                                        // 需要导入 自己写的jq插件
+                                        $('.items').waterfall();
+                                }
+                        })
+                });
+        })
+</script>
